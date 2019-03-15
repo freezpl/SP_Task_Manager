@@ -27,15 +27,13 @@
 
         <WrapPanel Grid.Row="1" Style="{StaticResource WPane}">
             <TextBox Style="{StaticResource MainTextBox}" Text="{Binding Path=NewTask}"/>
-            <Button Content="New Task" Command="{Binding AddProc}"/>
-            <TextBlock Style="{StaticResource MainText}" Text="Add new task:"/>
+            <Button Style="{StaticResource TM_Btn}" Content="ADD NEW TASK" Command="{Binding AddProc}"/>
+
             <TextBlock Style="{StaticResource MainText}" Text="Change priority:"/>
-            <ComboBox>
-                <TextBlock>Normal</TextBlock>
-                <TextBlock>Idle</TextBlock>
-                </ComboBox>
-                    <Button Content="Remove Task"/>
+            <ComboBox Style="{StaticResource TM_ComboBox}" ItemsSource="{Binding Priorities}" 
+                      SelectedValue="{Binding SelectedPrior}" />
+
+            <Button Style="{StaticResource Remove_Btn}" Content="Remove Task" Command="{Binding RemoveProc}"/>
         </WrapPanel>
-        
     </Grid>
 </Metro:MetroWindow>

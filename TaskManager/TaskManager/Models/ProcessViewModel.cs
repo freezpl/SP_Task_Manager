@@ -13,7 +13,10 @@ namespace TaskManager.Models
     {
         Process p;
 
-        public string Name {
+        public Process P { get { return p; } }
+
+        public string Name
+        {
             get { return p.ProcessName; }
         }
 
@@ -29,7 +32,54 @@ namespace TaskManager.Models
 
         public string PriorClass
         {
-            get { return p.PriorityClass.ToString(); }
+            get
+            {
+                try
+                {
+                    return p.PriorityClass.ToString();
+                }
+                catch
+                {
+
+                }
+                return null;
+            }
+            set
+            {
+                if (value == null && value.Length == 0)
+                    return;
+                try
+                {
+                    switch (value)
+                    {
+                        case "Normal":
+                            p.PriorityClass = ProcessPriorityClass.Normal;
+                            break;
+                        case "Idle":
+                            p.PriorityClass = ProcessPriorityClass.Idle;
+                            break;
+                        case "High":
+                            p.PriorityClass = ProcessPriorityClass.High;
+                            break;
+                        case "RealTime":
+                            p.PriorityClass = ProcessPriorityClass.RealTime;
+                            break;
+                        case "BelowNormal":
+                            p.PriorityClass = ProcessPriorityClass.BelowNormal;
+                            break;
+                        case "AboveNormal":
+                            p.PriorityClass = ProcessPriorityClass.AboveNormal;
+                            break;
+                        default:
+                            break;
+                    }
+                    OnPropertyChanged(nameof(PriorClass));
+                }
+                catch
+                {
+
+                }
+            }
         }
 
         public string Memory

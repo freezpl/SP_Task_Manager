@@ -20,7 +20,8 @@ namespace TaskManager.Models
 
         ProcessViewModel currentProcess;
         public ProcessViewModel CurrentProcess
-        { get
+        {
+            get
             {
                 return currentProcess;
             }
@@ -28,16 +29,52 @@ namespace TaskManager.Models
             {
                 currentProcess = value;
                 OnPropertyChanged(nameof(CurrentProcess));
-                MessageBox.Show(currentProcess.Name);
+                OnPropertyChanged(nameof(SelectedPrior));
             }
         }
 
         public string newTask;
-        public string NewTask {
+        public string NewTask
+        {
             get { return newTask; }
-            set { newTask = value; }
+            set
+            {
+                newTask = value;
+                OnPropertyChanged(nameof(NewTask));
+            }
         }
-        
+
+        List<string> priorities = new List<string> { "Normal", "Idle", "High", "RealTime", "BelowNormal", "AboveNormal" };
+
+        public List<string> Priorities { get { return priorities; } }
+
+        public string SelectedPrior
+        {
+            get
+            {
+                if (currentProcess == null)
+                    return null;
+                return priorities.FirstOrDefault(s => s == CurrentProcess.PriorClass);
+            }
+            set
+            {
+                try
+                {
+                    if (currentProcess == null)
+                    {
+                        MessageBox.Show("Choose process!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    CurrentProcess.PriorClass = value;
+                    OnPropertyChanged(nameof(SelectedPrior));
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         public TMViewModel()
         {
             Processes = new ObservableCollection<ProcessViewModel>();
@@ -45,7 +82,7 @@ namespace TaskManager.Models
                 Processes.Add(new ProcessViewModel(p));
 
             DispatcherTimer timer2 = new DispatcherTimer(
-                new TimeSpan(0, 0, 50),
+                new TimeSpan(0, 0, 5),
                 DispatcherPriority.Normal,
                 ReloadProcesses,
                 App.Current.Dispatcher);
@@ -53,9 +90,14 @@ namespace TaskManager.Models
 
         void ReloadProcesses(object o, EventArgs e)
         {
+            int? id = null;
+            if (CurrentProcess != null)
+                 id = CurrentProcess.Id;
             Processes.Clear();
             foreach (var p in Process.GetProcesses())
                 Processes.Add(new ProcessViewModel(p));
+            if (id != null)
+                CurrentProcess = Processes.FirstOrDefault(p => p.Id == id);
         }
 
         //InotifypropChange
@@ -71,13 +113,61 @@ namespace TaskManager.Models
         //Commands
         AppCommand addProc;
 
-        public AppCommand AddProc {
+        public AppCommand AddProc
+        {
             get
             {
                 return addProc ?? (addProc = new AppCommand((o) =>
                 {
-                    if(NewTask != null && NewTask.Length > 0)
-                    Process.Start(NewTask);
+                    if (NewTask != null && NewTask.Length > 0)
+                    {
+                        try
+                        {
+                            Process.Start(NewTask);
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show(e.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        finally
+                        {
+                            NewTask = "";
+                        }
+                    }
+                }));
+            }
+        }
+
+        AppCommand removeProc;
+
+        public AppCommand RemoveProc
+        {
+            get
+            {
+                return removeProc ?? (removeProc = new AppCommand((o) =>
+                {
+                    if (currentProcess == null)
+                    {
+                        MessageBox.Show("Choose process!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    MessageBoxResult res = MessageBox.Show("Are you sure? You want remowe task?", "Warning!",
+                        MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        try
+                        {
+                            currentProcess.P.Kill();
+                            ReloadProcesses(null, null);
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show(e.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+
                 }));
             }
         }
