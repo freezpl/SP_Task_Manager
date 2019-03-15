@@ -1,0 +1,41 @@
+﻿<Metro:MetroWindow x:Class="TaskManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TaskManager"
+        xmlns:Metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <ListView Name="v" ItemsSource="{Binding Processes}" SelectedItem="{Binding CurrentProcess}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Name}" >Name:</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Id}" >Id:</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding PriorClass}" >Priority:</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Priority}" >Base Priority:</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Memory}" >Usage Memory:</GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <WrapPanel Grid.Row="1" Style="{StaticResource WPane}">
+            <TextBox Style="{StaticResource MainTextBox}" Text="{Binding Path=NewTask}"/>
+            <Button Content="New Task" Command="{Binding AddProc}"/>
+            <TextBlock Style="{StaticResource MainText}" Text="Add new task:"/>
+            <TextBlock Style="{StaticResource MainText}" Text="Change priority:"/>
+            <ComboBox>
+                <TextBlock>Normal</TextBlock>
+                <TextBlock>Idle</TextBlock>
+                </ComboBox>
+                    <Button Content="Remove Task"/>
+        </WrapPanel>
+        
+    </Grid>
+</Metro:MetroWindow>
